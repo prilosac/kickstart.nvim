@@ -91,18 +91,16 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
--- Make line numbers default
+-- Show hybrid line numbers
 vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -153,6 +151,31 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+-- Improved half-page jumping (centers cursor on screen every jump)
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+
+-- kickstart.nvim says tabstop and shiftwidth are auto-detected by vim-sleuth,
+-- but in case I have issues with that I'm putting this here commented out
+-- -- use 4 spaces when showing existing tabs
+-- vim.opt.tabstop = 4
+-- -- use 4 spaces when indenting with '>'
+-- vim.opt.shiftwidth = 4
+-- -- insert 4 spaces when Tab is pressed
+-- vim.opt.expandtab = true
+
+-- Use block cursor in more modes, personal preference
+vim.opt.guicursor = 'n-v-ve-i-c-ci-sm:block,r-cr-o:hor20'
+
+-- configure folding
+vim.opt.foldmethod = 'indent'
+vim.opt.foldlevel = 99
+vim.opt.foldcolumn = '2'
+vim.opt.foldignore = ''
+
+-- Best remap ever (remove all trailing whitespace on F5)
+vim.keymap.set('n', '<F5>', ':let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>')
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -349,6 +372,20 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+
+      -- local vimgrep_arguments = {unpack(require("telescope.config").values.vimgrep_arguments)}
+      -- -- Search hidden/dotfiles
+      -- table.insert(vimgrep_arguments, "--hidden")
+      -- -- Don't search .git
+      -- table.insert(vimgrep_arguments, "--glob")
+      -- table.insert(vimgrep_arguments, "!**/.git/*")
+      -- -- Don't search `autodocs`
+      -- table.insert(vimgrep_arguments, "--glob")
+      -- table.insert(vimgrep_arguments, "!**/autodocs/*")
+      -- -- Don't search `static`
+      -- table.insert(vimgrep_arguments, "--glob")
+      -- table.insert(vimgrep_arguments, "!**/static/*")
+
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -356,9 +393,16 @@ require('lazy').setup({
         -- defaults = {
         --   mappings = {
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+        --     -- `hidden=true` is not supported in text grep commands.
+        --     vimgrep_arguments = vimgrep_arguments
         --   },
         -- },
-        -- pickers = {}
+        -- pickers = {
+        --   find_files = {
+        --     -- `hidden = true` will still show the inside of `.git/` as it's not `.gitignore`d.
+        --     find_command = {"rg", "--files", "--hidden", "--glob", "!**/.git/*"}
+        --   }
+        -- },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -374,7 +418,8 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sf', builtin.git_files, { desc = '[S]earch Git [F]iles' })
+      vim.keymap.set('n', '<leader>saf', builtin.find_files, { desc = '[S]earch [A]ll [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -567,7 +612,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -863,6 +908,27 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
+  { -- Neotree file tree
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+      'MunifTanjim/nui.nvim',
+      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    },
+    config = function()
+      vim.keymap.set('n', '<leader>\\', ':Neotree toggle reveal_force_cwd<cr>')
+      vim.keymap.set('n', '<leader>stat', ':Neotree float git_status<cr>')
+    end,
+  },
+  { -- Copilot
+    'github/copilot.vim',
+  },
+  { -- Copilot Chat
+    'CopilotC-Nvim/CopilotChat.nvim',
+    branch = 'canary',
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -880,7 +946,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
+  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua `
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
