@@ -419,7 +419,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.git_files, { desc = '[S]earch Git [F]iles' })
-      vim.keymap.set('n', '<leader>saf', builtin.find_files, { desc = '[S]earch [A]ll [F]iles' })
+      vim.keymap.set('n', '<leader>sa', builtin.find_files, { desc = '[S]earch [A]ll Files' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -920,6 +920,12 @@ require('lazy').setup({
     config = function()
       vim.keymap.set('n', '<leader>\\', ':Neotree toggle reveal_force_cwd<cr>')
       vim.keymap.set('n', '<leader>stat', ':Neotree float git_status<cr>')
+
+      require('neo-tree').setup {
+        close_if_last_window = true,
+        popup_border_style = 'rounded',
+        enable_git_status = true,
+      }
     end,
   },
   { -- Copilot
