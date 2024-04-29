@@ -373,36 +373,37 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
 
-      -- local vimgrep_arguments = {unpack(require("telescope.config").values.vimgrep_arguments)}
-      -- -- Search hidden/dotfiles
-      -- table.insert(vimgrep_arguments, "--hidden")
-      -- -- Don't search .git
-      -- table.insert(vimgrep_arguments, "--glob")
-      -- table.insert(vimgrep_arguments, "!**/.git/*")
-      -- -- Don't search `autodocs`
-      -- table.insert(vimgrep_arguments, "--glob")
-      -- table.insert(vimgrep_arguments, "!**/autodocs/*")
-      -- -- Don't search `static`
-      -- table.insert(vimgrep_arguments, "--glob")
-      -- table.insert(vimgrep_arguments, "!**/static/*")
+      local vimgrep_arguments = { unpack(require('telescope.config').values.vimgrep_arguments) }
+      -- Search hidden/dotfiles
+      table.insert(vimgrep_arguments, '--hidden')
+      -- Don't search .git
+      table.insert(vimgrep_arguments, '--glob')
+      table.insert(vimgrep_arguments, '!**/.git/*')
+      -- Don't search `autodocs`
+      table.insert(vimgrep_arguments, '--glob')
+      table.insert(vimgrep_arguments, '!**/autodocs/*')
+      -- Don't search `static`
+      table.insert(vimgrep_arguments, '--glob')
+      table.insert(vimgrep_arguments, '!**/static/*')
 
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --     -- `hidden=true` is not supported in text grep commands.
-        --     vimgrep_arguments = vimgrep_arguments
-        --   },
-        -- },
-        -- pickers = {
-        --   find_files = {
-        --     -- `hidden = true` will still show the inside of `.git/` as it's not `.gitignore`d.
-        --     find_command = {"rg", "--files", "--hidden", "--glob", "!**/.git/*"}
-        --   }
-        -- },
+        defaults = {
+          -- `hidden=true` is not supported in text grep commands.
+          vimgrep_arguments = vimgrep_arguments,
+          -- mappings = {
+          --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          -- },
+        },
+        pickers = {
+          find_files = {
+            -- `hidden = true` will still show the inside of `.git/` as it's not `.gitignore`d.
+            -- find_command = { 'fdfind', '--no-ignore-vcs', '--hidden' },
+            find_command = { 'rg', '--files', '--hidden', '--no-ignore-vcs', '--glob', '!**/.git/*', '--glob', '!**/autodocs/*', '--glob', '!**/static/*' },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -933,6 +934,11 @@ require('lazy').setup({
         close_if_last_window = true,
         popup_border_style = 'rounded',
         enable_git_status = true,
+        filesystem = {
+          filtered_items = {
+            hide_gitignored = false,
+          },
+        },
       }
     end,
   },
