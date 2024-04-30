@@ -948,6 +948,9 @@ require('lazy').setup({
   { -- Copilot Chat
     'CopilotC-Nvim/CopilotChat.nvim',
     branch = 'canary',
+    config = function()
+      require('CopilotChat').setup()
+    end,
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
